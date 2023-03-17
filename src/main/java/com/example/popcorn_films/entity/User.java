@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -35,6 +36,7 @@ public class User {
     private String name;
     @Column(nullable = false, length = 30)
     private String surname;
+    @Email
     @Column(unique = true, nullable = false, length = 50)
     private String email;
     @Column(nullable = false)
