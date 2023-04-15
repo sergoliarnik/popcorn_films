@@ -3,7 +3,6 @@ package com.example.popcorn_films.controller;
 import com.example.popcorn_films.constants.HttpStatuses;
 import com.example.popcorn_films.dto.PostDto;
 import com.example.popcorn_films.service.PostService;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,6 +32,7 @@ public class PostController {
 
     @ApiResponse(responseCode = "201", description = HttpStatuses.CREATED)
     @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
+    @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR')")
     @PostMapping
@@ -59,8 +59,8 @@ public class PostController {
     @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR')")
     @PutMapping
-    public ResponseEntity<PostDto> update(@RequestBody @Valid PostDto postDto){
-        return new ResponseEntity<>(postService.updatePost(postDto), HttpStatus.OK);
+    public ResponseEntity<PostDto> update(@RequestBody @Valid PostDto postDto, Principal principal){
+        return new ResponseEntity<>(postService.updatePost(postDto, principal.getName()), HttpStatus.OK);
     }
 
     @ApiResponse(responseCode = "200", description = HttpStatuses.OK)

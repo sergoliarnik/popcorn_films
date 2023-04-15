@@ -27,10 +27,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getUserById(Long id) {
+    public UserDto findUserById(Long id) {
         User user = userRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(resourceName, "id", String.valueOf(id)));
 
+        return mapper.map(user, UserDto.class);
+    }
+
+    @Override
+    public UserDto findUserByEmail(String email) {
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
         return mapper.map(user, UserDto.class);
     }
 }

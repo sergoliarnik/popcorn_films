@@ -1,42 +1,42 @@
 package com.example.popcorn_films.service.impl;
 
+import com.example.popcorn_films.constants.ErrorMessages;
+import com.example.popcorn_films.constants.Resources;
 import com.example.popcorn_films.dto.PostDto;
 import com.example.popcorn_films.entity.Post;
 import com.example.popcorn_films.entity.User;
 import com.example.popcorn_films.enums.UserRole;
+import com.example.popcorn_films.exception.ResourceAlreadyExistsException;
 import com.example.popcorn_films.exception.ResourceNotFoundException;
 import com.example.popcorn_films.repository.PostRepo;
 import com.example.popcorn_films.repository.UserRepo;
 import com.example.popcorn_films.service.PostService;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class PostServiceImpl implements PostService {
-
     private final PostRepo postRepo;
     private final ModelMapper mapper;
     private final UserRepo userRepo;
 
-    private final static String resourceName = "Post";
-
-    @Autowired
-    public PostServiceImpl(PostRepo postRepo, ModelMapper mapper, UserRepo userRepo) {
-        this.postRepo = postRepo;
-        this.mapper = mapper;
-        this.userRepo = userRepo;
-    }
 
     @Override
     public PostDto savePost(PostDto postDto, String userEmail) {
-        Post post = mapper.map(postDto, Post.class);
         User user = userRepo.findByEmail(userEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "email", userEmail));
+                .orElseThrow(() -> new ResourceNotFoundException(Resources.USER, "email", userEmail));
 
+        if(postRepo.findByTitle(postDto.getTitle()).isPresent()){
+            throw new ResourceAlreadyExistsException(Resources.POST);
+        }
+
+        Post post = mapper.map(postDto, Post.class);
         post.setUser(user);
 
         return mapper.map(postRepo.save(post), PostDto.class);
@@ -50,19 +50,27 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostDto findPostById(Long id) {
         Post post = postRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(resourceName, "id", String.valueOf(id)));
+                .orElseThrow(() -> new ResourceNotFoundException(Resources.POST, "id", String.valueOf(id)));
         return mapper.map(post, PostDto.class);
     }
 
     @Override
-    public PostDto updatePost(PostDto postDto) {
-        Long postId = postDto.getId();
-        postRepo.findById(postId).orElseThrow(
-                () -> new ResourceNotFoundException(resourceName, "id", String.valueOf(postId)));
+    @Transactional
+    public PostDto updatePost(PostDto postDto, String email) {
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException(Resources.USER, "email", email));
 
-        Post post = mapper.map(postDto, Post.class);
+        Post post = postRepo.findById(postDto.getId()).orElseThrow(
+                () -> new ResourceNotFoundException(Resources.POST, "id", String.valueOf(postDto.getId())));
 
-        return mapper.map(postRepo.save(post), PostDto.class);
+        if (user.getRole().equals(UserRole.EDITOR) && !post.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException(ErrorMessages.ACCESS_DENIED);
+        }
+
+        post.setTitle(postDto.getTitle());
+        post.setContent(postDto.getContent());
+
+        return mapper.map(post, PostDto.class);
     }
 
     @Override
@@ -73,12 +81,12 @@ public class PostServiceImpl implements PostService {
     @Override
     public void deletePostById(Long postId, String email) {
         User user = userRepo.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
-
+                .orElseThrow(() -> new ResourceNotFoundException(Resources.USER, "email", email));
         Post post = postRepo.findById(postId).orElseThrow(
-                () -> new ResourceNotFoundException(resourceName, "id", String.valueOf(postId)));
+                () -> new ResourceNotFoundException(Resources.POST, "id", String.valueOf(postId)));
+
         if (user.getRole().equals(UserRole.EDITOR) && !post.getUser().getId().equals(user.getId())) {
-            throw new AccessDeniedException("Access denied exception!");
+            throw new AccessDeniedException(ErrorMessages.ACCESS_DENIED);
         }
         postRepo.delete(post);
     }
