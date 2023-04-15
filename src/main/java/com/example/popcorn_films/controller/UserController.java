@@ -1,8 +1,9 @@
 package com.example.popcorn_films.controller;
 
 import com.example.popcorn_films.constants.HttpStatuses;
-import com.example.popcorn_films.dto.PostDto;
-import com.example.popcorn_films.service.PostService;
+import com.example.popcorn_films.dto.UpdateUserDto;
+import com.example.popcorn_films.dto.UserDto;
+import com.example.popcorn_films.service.UserService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,7 +15,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,63 +23,60 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 import java.util.List;
 
-@Tag(name = "Post Resource")
+@Tag(name = "User Resource")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("api/posts")
-public class PostController {
-    private final PostService postService;
-
-    @ApiResponse(responseCode = "201", description = HttpStatuses.CREATED)
-    @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
-    @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
-    @SecurityRequirement(name = "Bearer Authentication")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR')")
-    @PostMapping
-    public ResponseEntity<PostDto> save(@RequestBody @Valid PostDto postDto, Principal principal){
-        return new ResponseEntity<>(postService.savePost(postDto, principal.getName()), HttpStatus.CREATED);
-    }
+@RequestMapping("api/users")
+public class UserController {
+    private final UserService userService;
 
     @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
     @GetMapping
-    public ResponseEntity<List<PostDto>> findAll(){
-        return new ResponseEntity<>(postService.findAllPosts(), HttpStatus.OK);
+    public ResponseEntity<List<UserDto>> findAll() {
+        return new ResponseEntity<>(userService.findAllUsers(), HttpStatus.OK);
     }
 
     @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
     @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     @GetMapping("/{id}")
-    public ResponseEntity<PostDto> findById(@PathVariable Long id){
-        return new ResponseEntity<>(postService.findPostById(id), HttpStatus.OK);
+    public ResponseEntity<UserDto> findById(@PathVariable Long id) {
+        return new ResponseEntity<>(userService.findUserById(id), HttpStatus.OK);
+    }
+
+    @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
+    @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    @GetMapping("/{email}")
+    public ResponseEntity<UserDto> findByEmail(@PathVariable String email) {
+        return new ResponseEntity<>(userService.findUserByEmail(email), HttpStatus.OK);
     }
 
     @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
     @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
     @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     @SecurityRequirement(name = "Bearer Authentication")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR', 'USER')")
     @PutMapping
-    public ResponseEntity<PostDto> update(@RequestBody @Valid PostDto postDto, Principal principal){
-        return new ResponseEntity<>(postService.updatePost(postDto, principal.getName()), HttpStatus.OK);
+    public ResponseEntity<UserDto> update(@RequestBody @Valid UpdateUserDto updateUserDto, Principal principal) {
+        return new ResponseEntity<>(userService.updateUser(updateUserDto, principal.getName()), HttpStatus.OK);
     }
 
     @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
     @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     @SecurityRequirement(name = "Bearer Authentication")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteById(@PathVariable Long id, Principal principal){
-        postService.deletePostById(id, principal.getName());
+    public ResponseEntity<HttpStatus> deleteById(@PathVariable Long id) {
+        userService.deleteUserById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
+    @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     @SecurityRequirement(name = "Bearer Authentication")
-    @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/all")
-    public ResponseEntity<HttpStatus> deleteAll(){
-        postService.deleteAll();
+    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR', 'USER')")
+    @DeleteMapping
+    public ResponseEntity<HttpStatus> deleteCurrentUser(Principal principal) {
+        userService.deleteCurrentUser(principal.getName());
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
 }
