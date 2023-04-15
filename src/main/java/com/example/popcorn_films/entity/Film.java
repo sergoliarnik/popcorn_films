@@ -31,7 +31,7 @@ public class Film {
     private Long id;
 
     @Column(nullable = false)
-    private String api_title_id;
+    private String apiTitleId;
 
     @OneToMany
     private List<Comment> films;

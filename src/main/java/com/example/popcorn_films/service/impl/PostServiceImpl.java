@@ -74,11 +74,6 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void deleteAll() {
-        postRepo.deleteAll();
-    }
-
-    @Override
     public void deletePostById(Long postId, String email) {
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException(Resources.USER, "email", email));

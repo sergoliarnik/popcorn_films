@@ -72,14 +72,4 @@ public class PostController {
         postService.deletePostById(id, principal.getName());
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-    @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
-    @SecurityRequirement(name = "Bearer Authentication")
-    @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/all")
-    public ResponseEntity<HttpStatus> deleteAll(){
-        postService.deleteAll();
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
 }
