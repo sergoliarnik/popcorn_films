@@ -46,11 +46,7 @@ public class User {
     private String description;
 
     @Enumerated(value = EnumType.STRING)
-    @Column(nullable = false)
-    @ColumnDefault("'USER'")
-    private UserRole role;
+    private UserRole role = UserRole.USER;
     @Enumerated(value = EnumType.STRING)
-    @Column(nullable = false)
-    @ColumnDefault("'ACTIVE'")
-    private UserStatus status;
+    private UserStatus status = UserStatus.ACTIVE;
 }

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PostServiceImpl implements PostService {
@@ -29,7 +30,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDto createPost(PostDto postDto) {
+    public PostDto savePost(PostDto postDto) {
         Post post = mapper.map(postDto, Post.class);
         post.setUser(userRepo.findById(1L).orElseThrow());
 
@@ -39,14 +40,25 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDto> getAllPosts() {
+    public List<PostDto> findAllPosts() {
         return postRepo.findAll().stream().map(post -> mapper.map(post, PostDto.class)).toList();
     }
 
     @Override
-    public PostDto getPostById(Long id) {
+    public PostDto findPostById(Long id) {
         Post post = postRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(resourceName, "id", String.valueOf(id)));
         return mapper.map(post, PostDto.class);
+    }
+
+    @Override
+    public PostDto updatePost(PostDto postDto) {
+        Long postId = postDto.getId();
+        postRepo.findById(postId).orElseThrow(
+                () -> new ResourceNotFoundException(resourceName, "id", String.valueOf(postId)));
+
+        Post post = mapper.map(postDto, Post.class);
+
+        return mapper.map(postRepo.save(post), PostDto.class);
     }
 }
