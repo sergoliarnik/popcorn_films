@@ -2,16 +2,18 @@ package com.example.popcorn_films.service.impl;
 
 import com.example.popcorn_films.dto.PostDto;
 import com.example.popcorn_films.entity.Post;
+import com.example.popcorn_films.entity.User;
+import com.example.popcorn_films.enums.UserRole;
 import com.example.popcorn_films.exception.ResourceNotFoundException;
 import com.example.popcorn_films.repository.PostRepo;
 import com.example.popcorn_films.repository.UserRepo;
 import com.example.popcorn_films.service.PostService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PostServiceImpl implements PostService {
@@ -30,13 +32,14 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDto savePost(PostDto postDto) {
+    public PostDto savePost(PostDto postDto, String userEmail) {
         Post post = mapper.map(postDto, Post.class);
-        post.setUser(userRepo.findById(1L).orElseThrow());
+        User user = userRepo.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", userEmail));
 
-        Post newPost = postRepo.save(post);
+        post.setUser(user);
 
-        return mapper.map(newPost, PostDto.class);
+        return mapper.map(postRepo.save(post), PostDto.class);
     }
 
     @Override
@@ -60,5 +63,23 @@ public class PostServiceImpl implements PostService {
         Post post = mapper.map(postDto, Post.class);
 
         return mapper.map(postRepo.save(post), PostDto.class);
+    }
+
+    @Override
+    public void deleteAll() {
+        postRepo.deleteAll();
+    }
+
+    @Override
+    public void deletePostById(Long postId, String email) {
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+
+        Post post = postRepo.findById(postId).orElseThrow(
+                () -> new ResourceNotFoundException(resourceName, "id", String.valueOf(postId)));
+        if (user.getRole().equals(UserRole.EDITOR) && !post.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException("Access denied exception!");
+        }
+        postRepo.delete(post);
     }
 }

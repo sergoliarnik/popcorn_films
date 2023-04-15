@@ -1,5 +1,6 @@
 package com.example.popcorn_films.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,6 +28,6 @@ public class Post {
     private Long id;
     private String title;
     private String content;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private User user;
 }

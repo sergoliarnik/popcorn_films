@@ -4,6 +4,7 @@ import com.example.popcorn_films.security.JwtAuthenticationEntryPoint;
 import com.example.popcorn_films.security.JwtAuthenticationFilter;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+@RequiredArgsConstructor
 @Configuration
 @EnableMethodSecurity
 @SecurityScheme(
@@ -29,23 +31,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 )
 public class SecurityConfig {
 
-    private final UserDetailsService userDetailsService;
-
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
     private final JwtAuthenticationFilter authenticationFilter;
-
-    @Autowired
-    public SecurityConfig(UserDetailsService userDetailsService, JwtAuthenticationEntryPoint authenticationEntryPoint, JwtAuthenticationFilter authenticationFilter) {
-        this.userDetailsService = userDetailsService;
-        this.authenticationEntryPoint = authenticationEntryPoint;
-        this.authenticationFilter = authenticationFilter;
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
-    }
-
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -65,9 +52,14 @@ public class SecurityConfig {
         return http.build();
     }
 
-
     @Bean
     public static PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
+
 }
