@@ -2,6 +2,10 @@ package com.example.popcorn_films.controller;
 
 import com.example.popcorn_films.dto.PostDto;
 import com.example.popcorn_films.service.PostService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Tag(
+        name = "CRUD REST APIs for Post Resource"
+)
 @RestController
 @RequestMapping("api/posts")
 public class PostController {
@@ -28,8 +35,19 @@ public class PostController {
         this.postService = postService;
     }
 
-    @PostMapping
+    @Operation(
+            summary = "Create Post",
+            description = "Create post by using PostDto(id is ignored)"
+    )
+    @ApiResponse(
+            responseCode = "201",
+            description = "Http status 201 CREATED"
+    )
+    @SecurityRequirement(
+            name = "Bearer Authentication"
+    )
     @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping
     public ResponseEntity<PostDto> save(@RequestBody @Valid PostDto postDto){
         return new ResponseEntity<>(postService.savePost(postDto), HttpStatus.CREATED);
     }
@@ -39,6 +57,14 @@ public class PostController {
         return new ResponseEntity<>(postService.findAllPosts(), HttpStatus.OK);
     }
 
+    @Operation(
+            summary = "Get Post",
+            description = "Get post by id"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Http status 200 SUCCESS"
+    )
     @GetMapping("/{id}")
     public ResponseEntity<PostDto> findById(@PathVariable Long id){
         return new ResponseEntity<>(postService.findPostById(id), HttpStatus.OK);
