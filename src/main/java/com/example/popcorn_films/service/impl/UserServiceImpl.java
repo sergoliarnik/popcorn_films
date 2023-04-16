@@ -1,66 +1,87 @@
 package com.example.popcorn_films.service.impl;
 
+import com.example.popcorn_films.constants.ErrorMessages;
+import com.example.popcorn_films.constants.Resources;
+import com.example.popcorn_films.dto.PostDto;
+import com.example.popcorn_films.dto.UpdateUserDto;
 import com.example.popcorn_films.dto.UserDto;
+import com.example.popcorn_films.entity.Post;
 import com.example.popcorn_films.entity.User;
+import com.example.popcorn_films.enums.UserRole;
+import com.example.popcorn_films.enums.UserStatus;
 import com.example.popcorn_films.exception.ResourceNotFoundException;
 import com.example.popcorn_films.repository.UserRepo;
 import com.example.popcorn_films.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepo userRepo;
-    private final static String resourceName = "User";
-
-    @Autowired
-    public UserServiceImpl(UserRepo userRepo) {
-        this.userRepo = userRepo;
-    }
+    private final ModelMapper mapper;
 
 
     @Override
-    public UserDto createUser(UserDto userDto) {
-        return mapToDto(userRepo.save(mapToEntity(userDto)));
+    public UserDto findUserById(Long id) {
+        User user = userRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(Resources.USER, "id", String.valueOf(id)));
+
+        return mapper.map(user, UserDto.class);
     }
 
     @Override
-    public List<UserDto> getAllUsers() {
-        return userRepo.findAll().stream().map(this::mapToDto).toList();
+    public UserDto findUserByEmail(String email) {
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException(Resources.USER, "email", email));
+        return mapper.map(user, UserDto.class);
     }
 
     @Override
-    public UserDto getUserById(Long id) {
-        return mapToDto(userRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(resourceName, "id", String.valueOf(id))));
+    public List<UserDto> findAllUsers() {
+        return userRepo.findAll().stream()
+                .map(user -> mapper.map(user, UserDto.class))
+                .collect(Collectors.toList());
     }
 
-    private UserDto mapToDto(User user) {
-        UserDto userDto = new UserDto();
-        userDto.setId(user.getId());
-        userDto.setName(user.getName());
-        userDto.setSurname(user.getSurname());
-        userDto.setEmail(user.getEmail());
-        userDto.setPassword(user.getPassword());
-        userDto.setDescription(user.getDescription());
-        userDto.setRole(user.getRole());
-        userDto.setStatus(user.getStatus());
-        return userDto;
+    @Transactional
+    @Override
+    public UserDto updateUser(UpdateUserDto updateUserDto, String email) {
+        User currentUser = userRepo.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException(Resources.USER, "email", email));
+
+        if (!currentUser.getRole().equals(UserRole.ADMIN)
+                && !updateUserDto.getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException(ErrorMessages.ACCESS_DENIED);
+        }
+
+        currentUser.setName(updateUserDto.getName());
+        currentUser.setSurname(updateUserDto.getSurname());
+        currentUser.setDescription(updateUserDto.getDescription());
+
+        return mapper.map(currentUser, UserDto.class);
     }
 
-    private User mapToEntity(UserDto userDto) {
-        User user = new User();
-        user.setId(userDto.getId());
-        user.setName(userDto.getName());
-        user.setSurname(userDto.getSurname());
-        user.setEmail(userDto.getEmail());
-        user.setPassword(userDto.getPassword());
-        user.setDescription(userDto.getDescription());
-        user.setRole(userDto.getRole());
-        user.setStatus(userDto.getStatus());
-        return user;
+    @Override
+    @Transactional
+    public void deleteCurrentUser(String email) {
+        User currentUser = userRepo.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException(Resources.USER, "email", email));
+        userRepo.delete(currentUser);
+    }
+
+    @Override
+    @Transactional
+    public void deleteUserById(Long id) {
+        User currentUser = userRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(Resources.USER, "id", String.valueOf(id)));
+        userRepo.delete(currentUser);
     }
 }

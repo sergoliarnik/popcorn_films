@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,11 +35,10 @@ public class SavedFilm {
     @ManyToOne
     private User user;
 
-    @ManyToOne
+    @OneToOne
     private Film film;
 
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
-    @ColumnDefault("'WATCH_LATER'")
-    private SavedFilmStatus status;
+    private SavedFilmStatus status = SavedFilmStatus.WATCH_LATER;
 }

@@ -2,6 +2,7 @@ package com.example.popcorn_films.entity;
 
 import com.example.popcorn_films.enums.UserRole;
 import com.example.popcorn_films.enums.UserStatus;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,6 +10,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
@@ -17,7 +19,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
+
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -46,11 +49,21 @@ public class User {
     private String description;
 
     @Enumerated(value = EnumType.STRING)
-    @Column(nullable = false)
-    @ColumnDefault("'USER'")
-    private UserRole role;
+    private UserRole role = UserRole.USER;
     @Enumerated(value = EnumType.STRING)
-    @Column(nullable = false)
-    @ColumnDefault("'ACTIVE'")
-    private UserStatus status;
+    private UserStatus status = UserStatus.ACTIVE;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Post> posts;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<CommentLike> commentLikes;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<PostLike> postLikes;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<FilmComment> filmComments;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<PostComment> postComments;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<SavedFilm> savedFilms;
 }
