@@ -9,7 +9,9 @@ public final class Resources {
     public static final String POST_LIKE = "Post like";
     public static final String COMMENT_LIKE = "Comment like";
     public static final String SAVED_FILM = "Saved film";
+    public static final String RATING = "Rating";
 
 
-    private Resources(){}
+    private Resources() {
+    }
 }

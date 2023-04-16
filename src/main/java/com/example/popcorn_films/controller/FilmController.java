@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -123,6 +125,26 @@ public class FilmController {
     ResponseEntity<List<FilmDto>> getSaved(@RequestParam SavedFilmStatus status,
                                            Principal principal) {
 
-        return new ResponseEntity<>(filmService.getSave(status, principal.getName()), HttpStatus.OK);
+        return new ResponseEntity<>(filmService.getSaves(status, principal.getName()), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Rate film")
+    @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
+    @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR', 'USER')")
+    @GetMapping("/{id}/rate")
+    ResponseEntity<HttpStatus> rate(@PathVariable Long id, @RequestParam @Min(1) @Max(10) Long mark,
+                                    Principal principal) {
+        filmService.rate(id, mark, principal.getName());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get film rating")
+    @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
+    @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    @GetMapping("/{id}/rating")
+    ResponseEntity<Double> getRating(@PathVariable Long id) {
+        return new ResponseEntity<>(filmService.getRating(id), HttpStatus.OK);
     }
 }

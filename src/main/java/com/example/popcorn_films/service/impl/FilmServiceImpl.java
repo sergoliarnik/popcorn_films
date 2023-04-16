@@ -3,12 +3,14 @@ package com.example.popcorn_films.service.impl;
 import com.example.popcorn_films.constants.Resources;
 import com.example.popcorn_films.dto.FilmDto;
 import com.example.popcorn_films.entity.Film;
+import com.example.popcorn_films.entity.Rating;
 import com.example.popcorn_films.entity.SavedFilm;
 import com.example.popcorn_films.entity.User;
 import com.example.popcorn_films.enums.SavedFilmStatus;
 import com.example.popcorn_films.exception.ResourceAlreadyExistsException;
 import com.example.popcorn_films.exception.ResourceNotFoundException;
 import com.example.popcorn_films.repository.FilmRepo;
+import com.example.popcorn_films.repository.RatingRepo;
 import com.example.popcorn_films.repository.SavedFilmRepo;
 import com.example.popcorn_films.repository.UserRepo;
 import com.example.popcorn_films.service.FilmService;
@@ -26,6 +28,7 @@ public class FilmServiceImpl implements FilmService {
     private final UserRepo userRepo;
     private final SavedFilmRepo savedFilmRepo;
     private final ModelMapper mapper;
+    private final RatingRepo ratingRepo;
 
     @Override
     public FilmDto saveFilm(FilmDto filmDto) {
@@ -112,7 +115,7 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public List<FilmDto> getSave(SavedFilmStatus status, String userEmail) {
+    public List<FilmDto> getSaves(SavedFilmStatus status, String userEmail) {
         if (!userRepo.existsByEmail(userEmail)) {
             throw new ResourceNotFoundException(Resources.USER, "email", userEmail);
         }
@@ -122,5 +125,39 @@ public class FilmServiceImpl implements FilmService {
         return savedFilms.stream()
                 .map(savedFilm -> mapper.map(savedFilm.getFilm(), FilmDto.class))
                 .toList();
+    }
+
+    @Override
+    public void rate(Long filmId, Long mark, String userEmail) {
+        User user = userRepo.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException(Resources.USER, "email", userEmail));
+
+        Film film = filmRepo.findById(filmId).orElseThrow(
+                () -> new ResourceNotFoundException(Resources.FILM, "id", String.valueOf(filmId)));
+
+        if (ratingRepo.existsByUserIdAndFilmId(user.getId(), film.getId())) {
+            throw new ResourceAlreadyExistsException(Resources.RATING);
+        }
+
+        Rating rating = Rating.builder()
+                .user(user)
+                .film(film)
+                .mark(mark)
+                .build();
+
+        ratingRepo.save(rating);
+    }
+
+    @Override
+    public Double getRating(Long filmId) {
+        if (!filmRepo.existsById(filmId)) {
+            throw new ResourceNotFoundException(Resources.FILM, "id", String.valueOf(filmId));
+        }
+
+        if (!ratingRepo.existsByFilmId(filmId)) {
+            throw new ResourceNotFoundException(Resources.RATING);
+        }
+
+        return ratingRepo.findAvgMarkByFilmId(filmId);
     }
 }
