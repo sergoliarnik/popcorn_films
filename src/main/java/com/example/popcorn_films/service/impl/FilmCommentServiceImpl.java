@@ -3,11 +3,15 @@ package com.example.popcorn_films.service.impl;
 import com.example.popcorn_films.constants.ErrorMessages;
 import com.example.popcorn_films.constants.Resources;
 import com.example.popcorn_films.dto.CommentDto;
+import com.example.popcorn_films.entity.CommentLike;
 import com.example.popcorn_films.entity.Film;
 import com.example.popcorn_films.entity.FilmComment;
+import com.example.popcorn_films.entity.Like;
 import com.example.popcorn_films.entity.User;
 import com.example.popcorn_films.enums.UserRole;
+import com.example.popcorn_films.exception.ResourceAlreadyExistsException;
 import com.example.popcorn_films.exception.ResourceNotFoundException;
+import com.example.popcorn_films.repository.CommentLikeRepo;
 import com.example.popcorn_films.repository.FilmCommentRepo;
 import com.example.popcorn_films.repository.FilmRepo;
 import com.example.popcorn_films.repository.UserRepo;
@@ -26,6 +30,7 @@ public class FilmCommentServiceImpl implements FilmCommentService {
     private final FilmCommentRepo filmCommentRepo;
     private final FilmRepo filmRepo;
     private final UserRepo userRepo;
+    private final CommentLikeRepo commentLikeRepo;
     private final ModelMapper mapper;
 
     @Override
@@ -83,5 +88,42 @@ public class FilmCommentServiceImpl implements FilmCommentService {
         }
 
         filmCommentRepo.delete(filmComment);
+    }
+
+    @Override
+    public void like(Long id, String userEmail) {
+        User user = userRepo.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException(Resources.USER, "email", userEmail));
+        FilmComment filmComment = filmCommentRepo.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(Resources.FILM_COMMENT, "id", String.valueOf(id)));
+
+        CommentLike commentLike = CommentLike.builder()
+                .like(Like.builder()
+                        .user(user)
+                        .build())
+                .comment(filmComment.getComment())
+                .build();
+
+
+        if (commentLikeRepo.existsByLikeUserIdAndCommentId(user.getId(), filmComment.getComment().getId())) {
+            throw new ResourceAlreadyExistsException(Resources.COMMENT_LIKE);
+        }
+
+        commentLikeRepo.save(commentLike);
+    }
+
+    @Override
+    public void unlike(Long id, String userEmail) {
+        User user = userRepo.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException(Resources.USER, "email", userEmail));
+
+        FilmComment filmComment = filmCommentRepo.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(Resources.FILM_COMMENT, "id", String.valueOf(id)));
+
+        CommentLike commentLike = commentLikeRepo
+                .findByLikeUserIdAndCommentId(user.getId(), filmComment.getComment().getId())
+                .orElseThrow(() -> new ResourceNotFoundException(Resources.COMMENT_LIKE));
+
+        commentLikeRepo.delete(commentLike);
     }
 }

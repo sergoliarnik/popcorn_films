@@ -3,11 +3,14 @@ package com.example.popcorn_films.service.impl;
 import com.example.popcorn_films.constants.ErrorMessages;
 import com.example.popcorn_films.constants.Resources;
 import com.example.popcorn_films.dto.PostDto;
+import com.example.popcorn_films.entity.Like;
 import com.example.popcorn_films.entity.Post;
+import com.example.popcorn_films.entity.PostLike;
 import com.example.popcorn_films.entity.User;
 import com.example.popcorn_films.enums.UserRole;
 import com.example.popcorn_films.exception.ResourceAlreadyExistsException;
 import com.example.popcorn_films.exception.ResourceNotFoundException;
+import com.example.popcorn_films.repository.PostLikeRepo;
 import com.example.popcorn_films.repository.PostRepo;
 import com.example.popcorn_films.repository.UserRepo;
 import com.example.popcorn_films.service.PostService;
@@ -25,6 +28,7 @@ public class PostServiceImpl implements PostService {
     private final PostRepo postRepo;
     private final ModelMapper mapper;
     private final UserRepo userRepo;
+    private final PostLikeRepo postLikeRepo;
 
 
     @Override
@@ -32,7 +36,7 @@ public class PostServiceImpl implements PostService {
         User user = userRepo.findByEmail(userEmail)
                 .orElseThrow(() -> new ResourceNotFoundException(Resources.USER, "email", userEmail));
 
-        if(postRepo.findByTitle(postDto.getTitle()).isPresent()){
+        if (postRepo.findByTitle(postDto.getTitle()).isPresent()) {
             throw new ResourceAlreadyExistsException(Resources.POST);
         }
 
@@ -84,5 +88,41 @@ public class PostServiceImpl implements PostService {
             throw new AccessDeniedException(ErrorMessages.ACCESS_DENIED);
         }
         postRepo.delete(post);
+    }
+
+    @Override
+    public void like(Long id, String userEmail) {
+        User user = userRepo.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException(Resources.USER, "email", userEmail));
+        Post post = postRepo.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(Resources.POST, "id", String.valueOf(id)));
+
+        PostLike postLike = PostLike.builder()
+                .like(Like.builder()
+                        .user(user)
+                        .build())
+                .post(post)
+                .build();
+
+
+        if (postLikeRepo.existsByLikeUserIdAndPostId(user.getId(), post.getId())) {
+            throw new ResourceAlreadyExistsException(Resources.POST_LIKE);
+        }
+
+        postLikeRepo.save(postLike);
+    }
+
+    @Override
+    public void unlike(Long id, String userEmail) {
+        User user = userRepo.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException(Resources.USER, "email", userEmail));
+
+        Post post = postRepo.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException(Resources.POST, "id", String.valueOf(id)));
+
+        PostLike postLike = postLikeRepo.findByLikeUserIdAndPostId(user.getId(), post.getId()).orElseThrow(
+                () -> new ResourceNotFoundException(Resources.POST_LIKE));
+
+        postLikeRepo.delete(postLike);
     }
 }

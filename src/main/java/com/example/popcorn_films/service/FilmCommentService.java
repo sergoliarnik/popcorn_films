@@ -12,4 +12,8 @@ public interface FilmCommentService {
     CommentDto updateFilmComment(CommentDto commentDto, String userEmail);
 
     void deleteFilmCommentById(Long filmCommentId, String userEmail);
+
+    void like(Long filmCommentId, String userEmail);
+
+    void unlike(Long filmCommentId, String userEmail);
 }

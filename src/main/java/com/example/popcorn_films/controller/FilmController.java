@@ -65,7 +65,7 @@ public class FilmController {
         return new ResponseEntity<>(filmService.findFilmById(id), HttpStatus.OK);
     }
 
-    @Operation(summary = "Update user")
+    @Operation(summary = "Update film")
     @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
     @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
     @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
@@ -76,7 +76,7 @@ public class FilmController {
         return new ResponseEntity<>(filmService.updateFilm(filmDto), HttpStatus.OK);
     }
 
-    @Operation(summary = "Delete user by id")
+    @Operation(summary = "Delete film by id")
     @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
     @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     @SecurityRequirement(name = "Bearer Authentication")

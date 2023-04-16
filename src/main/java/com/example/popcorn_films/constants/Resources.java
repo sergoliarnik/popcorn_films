@@ -6,6 +6,8 @@ public final class Resources {
     public static final String FILM = "Film";
     public static final String FILM_COMMENT = "Film Comment";
     public static final String POST_COMMENT = "Post Comment";
+    public static final String POST_LIKE = "Post like";
+    public static final String COMMENT_LIKE = "Comment like";
 
     private Resources(){}
 }

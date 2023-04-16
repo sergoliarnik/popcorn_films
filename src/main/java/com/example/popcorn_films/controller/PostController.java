@@ -38,14 +38,14 @@ public class PostController {
     @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR')")
     @PostMapping
-    public ResponseEntity<PostDto> save(@RequestBody @Valid PostDto postDto, Principal principal){
+    public ResponseEntity<PostDto> save(@RequestBody @Valid PostDto postDto, Principal principal) {
         return new ResponseEntity<>(postService.savePost(postDto, principal.getName()), HttpStatus.CREATED);
     }
 
     @Operation(summary = "Find all posts")
     @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
     @GetMapping
-    public ResponseEntity<List<PostDto>> findAll(){
+    public ResponseEntity<List<PostDto>> findAll() {
         return new ResponseEntity<>(postService.findAllPosts(), HttpStatus.OK);
     }
 
@@ -53,7 +53,7 @@ public class PostController {
     @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
     @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     @GetMapping("/{id}")
-    public ResponseEntity<PostDto> findById(@PathVariable Long id){
+    public ResponseEntity<PostDto> findById(@PathVariable Long id) {
         return new ResponseEntity<>(postService.findPostById(id), HttpStatus.OK);
     }
 
@@ -64,7 +64,7 @@ public class PostController {
     @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR')")
     @PutMapping
-    public ResponseEntity<PostDto> update(@RequestBody @Valid PostDto postDto, Principal principal){
+    public ResponseEntity<PostDto> update(@RequestBody @Valid PostDto postDto, Principal principal) {
         return new ResponseEntity<>(postService.updatePost(postDto, principal.getName()), HttpStatus.OK);
     }
 
@@ -74,8 +74,32 @@ public class PostController {
     @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteById(@PathVariable Long id, Principal principal){
+    public ResponseEntity<HttpStatus> deleteById(@PathVariable Long id, Principal principal) {
         postService.deletePostById(id, principal.getName());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(summary = "Like post")
+    @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
+    @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
+    @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR', 'USER')")
+    @PostMapping("/{id}/like")
+    public ResponseEntity<HttpStatus> like(@PathVariable Long id, Principal principal) {
+        postService.like(id, principal.getName());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(summary = "Unlike post")
+    @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
+    @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
+    @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR', 'USER')")
+    @DeleteMapping("/{id}/unlike")
+    public ResponseEntity<HttpStatus> dislike(@PathVariable Long id, Principal principal) {
+        postService.unlike(id, principal.getName());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

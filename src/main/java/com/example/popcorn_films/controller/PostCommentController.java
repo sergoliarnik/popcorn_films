@@ -76,4 +76,28 @@ public class PostCommentController {
         postCommentService.deletePostCommentById(id, principal.getName());
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @Operation(summary = "Like post comment")
+    @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
+    @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
+    @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR', 'USER')")
+    @PostMapping("/{id}/like")
+    public ResponseEntity<HttpStatus> like(@PathVariable Long id, Principal principal) {
+        postCommentService.like(id, principal.getName());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(summary = "Unlike post comment")
+    @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
+    @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
+    @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR', 'USER')")
+    @DeleteMapping("/{id}/unlike")
+    public ResponseEntity<HttpStatus> dislike(@PathVariable Long id, Principal principal) {
+        postCommentService.unlike(id, principal.getName());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

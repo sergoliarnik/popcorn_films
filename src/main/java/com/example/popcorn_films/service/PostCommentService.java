@@ -12,4 +12,8 @@ public interface PostCommentService {
     CommentDto updatePostComment(CommentDto commentDto, String userEmail);
 
     void deletePostCommentById(Long postCommentId, String userEmail);
+
+    void like(Long filmCommentId, String userEmail);
+
+    void unlike(Long filmCommentId, String userEmail);
 }
