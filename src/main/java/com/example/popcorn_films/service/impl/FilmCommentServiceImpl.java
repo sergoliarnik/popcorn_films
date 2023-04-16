@@ -31,7 +31,7 @@ public class FilmCommentServiceImpl implements FilmCommentService {
     @Override
     public List<CommentDto> findFilmCommentsByFilmId(Long filmId) {
         return filmCommentRepo.findAllByFilmId(filmId).stream()
-                .map(filmComment -> new CommentDto(filmComment.getId(), filmComment.getComment().getText()))
+                .map(filmComment -> mapper.map(filmComment, CommentDto.class))
                 .toList();
     }
 
@@ -78,7 +78,7 @@ public class FilmCommentServiceImpl implements FilmCommentService {
                 () -> new ResourceNotFoundException(Resources.FILM_COMMENT, "id", String.valueOf(filmCommentId)));
 
         if (!user.getId().equals(filmComment.getComment().getUser().getId())
-        && !user.getRole().equals(UserRole.ADMIN)) {
+                && !user.getRole().equals(UserRole.ADMIN)) {
             throw new AccessDeniedException(ErrorMessages.ACCESS_DENIED);
         }
 
