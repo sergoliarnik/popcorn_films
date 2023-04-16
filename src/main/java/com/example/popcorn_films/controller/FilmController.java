@@ -3,6 +3,7 @@ package com.example.popcorn_films.controller;
 import com.example.popcorn_films.constants.HttpStatuses;
 import com.example.popcorn_films.dto.FilmDto;
 import com.example.popcorn_films.service.FilmService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,6 +30,7 @@ import java.util.List;
 public class FilmController {
     private final FilmService filmService;
 
+    @Operation(summary = "Save new film")
     @ApiResponse(responseCode = "201", description = HttpStatuses.CREATED)
     @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
     @SecurityRequirement(name = "Bearer Authentication")
@@ -38,6 +40,7 @@ public class FilmController {
         return new ResponseEntity<>(filmService.saveFilm(filmDto), HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Save all only new films")
     @ApiResponse(responseCode = "201", description = HttpStatuses.CREATED)
     @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
     @SecurityRequirement(name = "Bearer Authentication")
@@ -47,12 +50,14 @@ public class FilmController {
         return new ResponseEntity<>(filmService.saveAllOnlyNewFilms(filmDto), HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Find all films")
     @ApiResponse(responseCode = "200", description = HttpStatuses.CREATED)
     @GetMapping
     ResponseEntity<List<FilmDto>> findAll() {
         return new ResponseEntity<>(filmService.findAllFilms(), HttpStatus.OK);
     }
 
+    @Operation(summary = "Find film by id")
     @ApiResponse(responseCode = "200", description = HttpStatuses.CREATED)
     @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     @GetMapping("/{id}")
@@ -60,6 +65,7 @@ public class FilmController {
         return new ResponseEntity<>(filmService.findFilmById(id), HttpStatus.OK);
     }
 
+    @Operation(summary = "Update user")
     @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
     @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
     @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
@@ -70,6 +76,7 @@ public class FilmController {
         return new ResponseEntity<>(filmService.updateFilm(filmDto), HttpStatus.OK);
     }
 
+    @Operation(summary = "Delete user by id")
     @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
     @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     @SecurityRequirement(name = "Bearer Authentication")

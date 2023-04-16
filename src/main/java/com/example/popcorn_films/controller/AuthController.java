@@ -25,9 +25,10 @@ public class AuthController {
 
     private final AuthService authService;
 
+
+    @Operation(summary = "Login user")
     @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
     @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
-    @Operation(summary = "Login user")
     @PostMapping("/login")
     public ResponseEntity<JwtAuthResponse> login(@Valid @RequestBody LoginDto loginDto) {
         String token = authService.login(loginDto);
@@ -38,9 +39,9 @@ public class AuthController {
         return ResponseEntity.ok(jwtAuthResponse);
     }
 
+    @Operation(summary = "Register user")
     @ApiResponse(responseCode = "201", description = HttpStatuses.CREATED)
     @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
-    @Operation(summary = "Register user")
     @PostMapping("/register")
     public ResponseEntity<String> register(@Valid @RequestBody RegisterDto registerDto) {
         String response = authService.register(registerDto);
