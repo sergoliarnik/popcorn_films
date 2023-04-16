@@ -8,6 +8,8 @@ public final class Resources {
     public static final String POST_COMMENT = "Post Comment";
     public static final String POST_LIKE = "Post like";
     public static final String COMMENT_LIKE = "Comment like";
+    public static final String SAVED_FILM = "Saved film";
+
 
     private Resources(){}
 }

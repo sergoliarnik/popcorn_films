@@ -2,6 +2,7 @@ package com.example.popcorn_films.controller;
 
 import com.example.popcorn_films.constants.HttpStatuses;
 import com.example.popcorn_films.dto.FilmDto;
+import com.example.popcorn_films.enums.SavedFilmStatus;
 import com.example.popcorn_films.service.FilmService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,8 +20,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.List;
 
 @Tag(name = "Film Resource")
@@ -84,6 +87,30 @@ public class FilmController {
     @DeleteMapping("/{id}")
     ResponseEntity<HttpStatus> deleteById(@PathVariable Long id) {
         filmService.deleteFilmById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(summary = "Add to saved film")
+    @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
+    @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR', 'USER')")
+    @PostMapping("/{id}/add-to-saved")
+    ResponseEntity<HttpStatus> addToSaved(@PathVariable Long id, @RequestParam SavedFilmStatus status,
+                                          Principal principal) {
+        filmService.addToSaved(id, status, principal.getName());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(summary = "Remove from saved film")
+    @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
+    @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR', 'USER')")
+    @PostMapping("/{id}/remove-from-saved")
+    ResponseEntity<HttpStatus> removeFromSaved(@PathVariable Long id, @RequestParam SavedFilmStatus status,
+                                               Principal principal) {
+        filmService.removeFromSaved(id, status, principal.getName());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
