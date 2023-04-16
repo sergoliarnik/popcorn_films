@@ -16,4 +16,6 @@ public interface FilmCommentService {
     void like(Long filmCommentId, String userEmail);
 
     void unlike(Long filmCommentId, String userEmail);
+
+    Long getCountOfLikes(Long filmCommentId);
 }

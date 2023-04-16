@@ -126,4 +126,12 @@ public class PostCommentServiceImpl implements PostCommentService {
 
         commentLikeRepo.delete(commentLike);
     }
+
+    @Override
+    public Long getCountOfLikes(Long postCommentId) {
+        PostComment postComment = postCommentRepo.findById(postCommentId).orElseThrow(
+                () -> new ResourceNotFoundException(Resources.POST_COMMENT, "id", String.valueOf(postCommentId)));
+
+        return commentLikeRepo.countAllByCommentId(postComment.getComment().getId());
+    }
 }

@@ -102,4 +102,12 @@ public class PostController {
         postService.unlike(id, principal.getName());
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @Operation(summary = "Get count of likes")
+    @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
+    @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    @GetMapping("/{id}/likes/count")
+    public ResponseEntity<Long> getCountOfLikes(@PathVariable Long id) {
+        return new ResponseEntity<>(postService.getCountOfLikes(id),HttpStatus.OK);
+    }
 }

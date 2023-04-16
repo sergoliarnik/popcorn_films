@@ -125,4 +125,11 @@ public class PostServiceImpl implements PostService {
 
         postLikeRepo.delete(postLike);
     }
+
+    public Long getCountOfLikes(Long postId) {
+        if (!postRepo.existsById(postId)) {
+            throw new ResourceNotFoundException(Resources.POST, "id", String.valueOf(postId));
+        }
+        return postLikeRepo.countAllByPostId(postId);
+    }
 }

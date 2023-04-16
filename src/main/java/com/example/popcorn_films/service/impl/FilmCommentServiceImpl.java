@@ -7,6 +7,7 @@ import com.example.popcorn_films.entity.CommentLike;
 import com.example.popcorn_films.entity.Film;
 import com.example.popcorn_films.entity.FilmComment;
 import com.example.popcorn_films.entity.Like;
+import com.example.popcorn_films.entity.PostComment;
 import com.example.popcorn_films.entity.User;
 import com.example.popcorn_films.enums.UserRole;
 import com.example.popcorn_films.exception.ResourceAlreadyExistsException;
@@ -125,5 +126,13 @@ public class FilmCommentServiceImpl implements FilmCommentService {
                 .orElseThrow(() -> new ResourceNotFoundException(Resources.COMMENT_LIKE));
 
         commentLikeRepo.delete(commentLike);
+    }
+
+    @Override
+    public Long getCountOfLikes(Long filmCommentId) {
+        FilmComment filmComment = filmCommentRepo.findById(filmCommentId).orElseThrow(
+                () -> new ResourceNotFoundException(Resources.FILM_COMMENT, "id", String.valueOf(filmCommentId)));
+
+        return commentLikeRepo.countAllByCommentId(filmComment.getComment().getId());
     }
 }

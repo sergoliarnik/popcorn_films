@@ -13,4 +13,6 @@ public interface PostService {
     void like(Long id, String userEmail);
 
     void unlike(Long id, String userEmail);
+
+    Long getCountOfLikes(Long postId);
 }
