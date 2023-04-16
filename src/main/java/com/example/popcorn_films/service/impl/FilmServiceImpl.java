@@ -110,4 +110,17 @@ public class FilmServiceImpl implements FilmService {
 
         savedFilmRepo.delete(savedFilm);
     }
+
+    @Override
+    public List<FilmDto> getSave(SavedFilmStatus status, String userEmail) {
+        if (!userRepo.existsByEmail(userEmail)) {
+            throw new ResourceNotFoundException(Resources.USER, "email", userEmail);
+        }
+
+        List<SavedFilm> savedFilms = savedFilmRepo.findByStatus(status);
+
+        return savedFilms.stream()
+                .map(savedFilm -> mapper.map(savedFilm.getFilm(), FilmDto.class))
+                .toList();
+    }
 }
