@@ -40,6 +40,5 @@ public class SavedFilm {
 
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
-    @ColumnDefault("'WATCH_LATER'")
-    private SavedFilmStatus status;
+    private SavedFilmStatus status = SavedFilmStatus.WATCH_LATER;
 }

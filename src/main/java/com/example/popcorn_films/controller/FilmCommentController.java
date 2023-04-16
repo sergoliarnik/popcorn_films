@@ -1,0 +1,78 @@
+package com.example.popcorn_films.controller;
+
+import com.example.popcorn_films.constants.HttpStatuses;
+import com.example.popcorn_films.dto.CommentDto;
+import com.example.popcorn_films.service.FilmCommentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.security.Principal;
+import java.util.List;
+
+@Tag(name = "Film Comment Resource")
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("api/film-comments")
+public class FilmCommentController {
+    private final FilmCommentService filmCommentService;
+
+    @Operation(summary = "Find all film comments by film id")
+    @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
+    @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
+    @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    @GetMapping
+    ResponseEntity<List<CommentDto>> findAllByFilmId(@RequestParam("film_id") Long filmId) {
+        return new ResponseEntity<>(filmCommentService.findFilmCommentsByFilmId(filmId), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Save film comment")
+    @ApiResponse(responseCode = "201", description = HttpStatuses.CREATED)
+    @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
+    @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR', 'USER')")
+    @PostMapping
+    ResponseEntity<CommentDto> save(@RequestBody CommentDto commentDto, @RequestParam("film_id") Long filmId,
+                                    Principal principal) {
+        return new ResponseEntity<>(filmCommentService.saveFilmComment(commentDto, principal.getName(), filmId),
+                HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "Update film comment")
+    @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
+    @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
+    @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR', 'USER')")
+    @PutMapping
+    ResponseEntity<CommentDto> update(@RequestBody CommentDto commentDto, Principal principal) {
+        return new ResponseEntity<>(filmCommentService.updateFilmComment(commentDto, principal.getName()),
+                HttpStatus.OK);
+    }
+
+    @Operation(summary = "Delete film comment by id")
+    @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
+    @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR', 'USER')")
+    @DeleteMapping("/{id}")
+    ResponseEntity<HttpStatus> delete(@PathVariable Long id, Principal principal) {
+        filmCommentService.deleteFilmCommentById(id, principal.getName());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+}

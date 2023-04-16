@@ -13,6 +13,8 @@ public final class ValidationErrorMessages {
             "The user description should have a minimum of 1 characters and a maximum of 500 characters.";
     public static final String USER_PASSWORD_LENGTH_RANGE_ERROR =
             "The user password should have a minimum of 8 characters and a maximum of 12 characters.";
+    public static final String FILM_COMMENT_TEXT_LENGTH_RANGE_ERROR =
+            "The film comment text should have a minimum of 1 characters and a maximum of 1000 characters.";
     public static final String USER_EMAIL_WRONG_FORMAT =
             "The user email should be correct";
 

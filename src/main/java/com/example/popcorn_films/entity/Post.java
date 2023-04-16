@@ -31,7 +31,7 @@ public class Post {
     private Long id;
     private String title;
     private String content;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private User user;
     @OneToMany(cascade = CascadeType.ALL)
     private Set<PostLike> postLikes;

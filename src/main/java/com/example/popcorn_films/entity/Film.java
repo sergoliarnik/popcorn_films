@@ -1,5 +1,6 @@
 package com.example.popcorn_films.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -33,8 +34,8 @@ public class Film {
     @Column(nullable = false)
     private String apiTitleId;
 
-    @OneToMany
-    private List<Comment> films;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<FilmComment> films;
 
     @OneToMany
     private Set<Rating> ratings;
