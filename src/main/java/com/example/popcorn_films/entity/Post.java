@@ -33,8 +33,8 @@ public class Post {
     private String content;
     @ManyToOne
     private User user;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "post")
     private Set<PostLike> postLikes;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "post")
     private Set<PostComment> postComments;
 }

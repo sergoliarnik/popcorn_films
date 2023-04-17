@@ -39,6 +39,6 @@ public class Comment {
     @ManyToOne
     private User user;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "comment")
     private Set<CommentLike> commentLikes;
 }

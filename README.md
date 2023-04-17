@@ -6,6 +6,15 @@ Before setting up the Popcorn Films Java project, you'll need the following soft
 
 * Java Development Kit (JDK) 17 or higher
 * PostgreSQL
+## Creating a Database
+1. Open pgAdmin 4 and press right mouse button on 'Databases'
+
+ ![img.png](readmePhotos/settingDB1.png)
+
+2. Write 'popcorn_films' and press 'Save'
+
+![img.png](readmePhotos/settingDB2.png)
+
 ## Setup Instructions
 Follow the steps below to set up the Popcorn Films Java project:
 
@@ -13,18 +22,56 @@ Follow the steps below to set up the Popcorn Films Java project:
 ```git clone https://github.com/sergoliarnik/popcorn_films.git```
 2. Open project in IntelliJ IDEA Ultimate Edition
 3. Set properties
-   ![img.png](readmePhotos/settingEnvVar1.png)
+
+    ![img.png](readmePhotos/settingEnvVar1.png)
 
     ![img.png](readmePhotos/settingEnvVar2.png)
 
     ![img.png](readmePhotos/settingEnvVar3.png)
 
-    ![img.png](readmePhotos/settingEnvVar4.png)
-4. Press run
-5. The Popcorn Films application should now be running locally on your machine. 
-6. You can access it's Swagger in your web browser 
+    Environment variables:
+
+| Name        | Value                                          |
+|-------------|------------------------------------------------|
+| DB_PASSWORD | YOUR_PASSWORD                                  |
+| DB_URL      | jdbc:postgresql://localhost:5432/popcorn_films |
+| DB_USERNAME | postgres                                       |
+
+![img.png](readmePhotos/settingEnvVar4.png)
+
+4. Database fillig
+
+    ![img.png](readmePhotos/fillingDB1.png)
+    ![img.png](readmePhotos/fillingDB2.png)
+    ![img.png](readmePhotos/fillingDB3.png)
+    ![img.png](readmePhotos/fillingDB4.png)
+
+    Change this property on first run to ```create```
+
+    **Don't forget to return ```update```** or all information will be cleared at the next run
+5. Press run
+6. The Popcorn Films application should now be running locally on your machine. 
+7. You can access it's Swagger in your web browser 
  at http://localhost:8080/swagger-ui/index.html#/.
-7. You can now use the Popcorn Films application to browse and manage
+8. To make authorized request follow next steps
+
+   ![img.png](readmePhotos/swaggerWorkflow1.png)
+   ![img.png](readmePhotos/swaggerWorkflow2.png)
+
+   **Copy token**
+   ![img.png](readmePhotos/swaggerWorkflow3.png)
+   ![img.png](readmePhotos/swaggerWorkflow4.png)
+
+   **Paste token**
+
+   ![img.png](readmePhotos/swaggerWorkflow5.png)
+
+   **Make your request**
+9. Be carefully some endpoints are allowed only for user with role `ADMIN`. You can set this role in the db.
+
+![img.png](readmePhotos/settingAdmin.png)
+
+10. You can now use the Popcorn Films application to browse and manage
 movies by accessing the various endpoints provided by the application.
 ## Project Structure
 The Popcorn Films Java project follows the standard Maven project structure, with the following key directories:
