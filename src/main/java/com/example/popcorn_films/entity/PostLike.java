@@ -33,4 +33,6 @@ public class PostLike {
 
     @OneToOne(cascade = CascadeType.ALL)
     private Like like;
+
+
 }

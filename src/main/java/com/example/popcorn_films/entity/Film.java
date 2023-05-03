@@ -34,9 +34,9 @@ public class Film {
     @Column(nullable = false)
     private String apiTitleId;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "film")
     private List<FilmComment> films;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "film")
     private Set<Rating> ratings;
 }

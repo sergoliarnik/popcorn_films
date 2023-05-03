@@ -53,17 +53,9 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     private UserStatus status = UserStatus.ACTIVE;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Post> posts;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<CommentLike> commentLikes;
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<PostLike> postLikes;
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<FilmComment> filmComments;
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<PostComment> postComments;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<SavedFilm> savedFilms;
 }
