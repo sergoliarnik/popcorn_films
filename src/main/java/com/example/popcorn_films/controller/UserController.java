@@ -48,14 +48,6 @@ public class UserController {
         return new ResponseEntity<>(userService.findUserById(id), HttpStatus.OK);
     }
 
-    @Operation(summary = "Find user by email")
-    @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
-    @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
-    @GetMapping("/{email}")
-    public ResponseEntity<UserDto> findByEmail(@PathVariable String email) {
-        return new ResponseEntity<>(userService.findUserByEmail(email), HttpStatus.OK);
-    }
-
     @Operation(summary = "Update user")
     @ApiResponse(responseCode = "200", description = HttpStatuses.OK)
     @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
