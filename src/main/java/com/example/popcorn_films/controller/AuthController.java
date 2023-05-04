@@ -4,7 +4,10 @@ import com.example.popcorn_films.constants.HttpStatuses;
 import com.example.popcorn_films.dto.JwtAuthResponse;
 import com.example.popcorn_films.dto.LoginDto;
 import com.example.popcorn_films.dto.RegisterDto;
+import com.example.popcorn_films.dto.UserDto;
+import com.example.popcorn_films.entity.User;
 import com.example.popcorn_films.service.AuthService;
+import com.example.popcorn_films.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserService userService;
 
 
     @Operation(summary = "Login user")
@@ -35,8 +39,11 @@ public class AuthController {
     public ResponseEntity<JwtAuthResponse> login(@Valid @RequestBody LoginDto loginDto) {
         String token = authService.login(loginDto);
 
+        UserDto userDto = userService.findUserByEmail(loginDto.getEmail());
+
         JwtAuthResponse jwtAuthResponse = new JwtAuthResponse();
         jwtAuthResponse.setAccessToken(token);
+        jwtAuthResponse.setUserId(userDto.getId());
 
         return ResponseEntity.ok(jwtAuthResponse);
     }

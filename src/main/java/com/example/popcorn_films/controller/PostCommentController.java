@@ -39,7 +39,7 @@ public class PostCommentController {
     @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
     @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     @GetMapping
-    ResponseEntity<List<CommentDto>> findAllByFilmId(@RequestParam("post_id") Long postId) {
+    ResponseEntity<List<CommentDto>> findAllByPostId(@RequestParam("post_id") Long postId) {
         return new ResponseEntity<>(postCommentService.findPostCommentsByPostId(postId), HttpStatus.OK);
     }
 
