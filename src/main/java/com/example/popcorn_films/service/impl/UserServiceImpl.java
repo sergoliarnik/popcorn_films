@@ -2,19 +2,17 @@ package com.example.popcorn_films.service.impl;
 
 import com.example.popcorn_films.constants.ErrorMessages;
 import com.example.popcorn_films.constants.Resources;
-import com.example.popcorn_films.dto.PostDto;
 import com.example.popcorn_films.dto.UpdateUserDto;
 import com.example.popcorn_films.dto.UserDto;
-import com.example.popcorn_films.entity.Post;
 import com.example.popcorn_films.entity.User;
 import com.example.popcorn_films.enums.UserRole;
-import com.example.popcorn_films.enums.UserStatus;
 import com.example.popcorn_films.exception.ResourceNotFoundException;
 import com.example.popcorn_films.repository.UserRepo;
 import com.example.popcorn_films.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +25,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepo userRepo;
     private final ModelMapper mapper;
+    private final PasswordEncoder passwordEncoder;
+
 
 
     @Override
@@ -65,6 +65,8 @@ public class UserServiceImpl implements UserService {
         currentUser.setName(updateUserDto.getName());
         currentUser.setSurname(updateUserDto.getSurname());
         currentUser.setDescription(updateUserDto.getDescription());
+        currentUser.setPassword(passwordEncoder.encode(updateUserDto.getPassword()));
+        currentUser.setEmail(updateUserDto.getEmail());
 
         return mapper.map(currentUser, UserDto.class);
     }
