@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface SavedFilmRepo extends JpaRepository<SavedFilm, Long> {
     Optional<SavedFilm> findByFilmIdAndStatus(Long filmId, SavedFilmStatus savedFilmStatus);
 
-    List<SavedFilm> findByStatus(SavedFilmStatus savedFilmStatus);
+    List<SavedFilm> findByUserIdAndStatus(Long userId, SavedFilmStatus savedFilmStatus);
 
     Boolean existsByFilmIdAndStatus(Long filmId, SavedFilmStatus savedFilmStatus);
 }

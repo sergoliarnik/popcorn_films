@@ -116,11 +116,9 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public List<FilmDto> getSaves(SavedFilmStatus status, String userEmail) {
-        if (!userRepo.existsByEmail(userEmail)) {
-            throw new ResourceNotFoundException(Resources.USER, "email", userEmail);
-        }
+        User user = userRepo.findByEmail(userEmail).orElseThrow(() -> new ResourceNotFoundException(Resources.USER, "email", userEmail));
 
-        List<SavedFilm> savedFilms = savedFilmRepo.findByStatus(status);
+        List<SavedFilm> savedFilms = savedFilmRepo.findByUserIdAndStatus(user.getId(), status);
 
         return savedFilms.stream()
                 .map(savedFilm -> mapper.map(savedFilm.getFilm(), FilmDto.class))
