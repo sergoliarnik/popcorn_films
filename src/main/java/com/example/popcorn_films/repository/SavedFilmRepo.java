@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SavedFilmRepo extends JpaRepository<SavedFilm, Long> {
-    Optional<SavedFilm> findByFilmIdAndStatus(Long filmId, SavedFilmStatus savedFilmStatus);
+    Optional<SavedFilm> findByUserIdAndFilmApiTitleIdAndStatus(Long userId, String filmApiId, SavedFilmStatus savedFilmStatus);
 
     List<SavedFilm> findByUserIdAndStatus(Long userId, SavedFilmStatus savedFilmStatus);
 

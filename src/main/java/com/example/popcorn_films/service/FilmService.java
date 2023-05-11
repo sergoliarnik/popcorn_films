@@ -18,9 +18,9 @@ public interface FilmService {
 
     void deleteFilmById(Long id);
 
-    void addToSaved(Long id, SavedFilmStatus status, String userEmail);
+    void addToSaved(String id, SavedFilmStatus status, String userEmail);
 
-    void removeFromSaved(Long id, SavedFilmStatus status, String userEmail);
+    void removeFromSaved(String id, SavedFilmStatus status, String userEmail);
 
     List<FilmDto> getSaves(SavedFilmStatus status, String userEmail);
 

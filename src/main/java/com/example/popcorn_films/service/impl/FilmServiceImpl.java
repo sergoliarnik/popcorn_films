@@ -17,6 +17,7 @@ import com.example.popcorn_films.service.FilmService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -78,14 +79,14 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public void addToSaved(Long filmId, SavedFilmStatus status, String userEmail) {
+    @Transactional
+    public void addToSaved(String filmApiId, SavedFilmStatus status, String userEmail) {
         User user = userRepo.findByEmail(userEmail)
                 .orElseThrow(() -> new ResourceNotFoundException(Resources.USER, "email", userEmail));
 
-        Film film = filmRepo.findById(filmId).orElseThrow(
-                () -> new ResourceNotFoundException(Resources.FILM, "id", String.valueOf(filmId)));
+        Film film = filmRepo.findByApiTitleId(filmApiId).orElse(filmRepo.save(Film.builder().apiTitleId(filmApiId).build()));
 
-        if (savedFilmRepo.existsByFilmIdAndStatus(filmId, status)) {
+        if (savedFilmRepo.existsByFilmIdAndStatus(film.getId(), status)) {
             throw new ResourceAlreadyExistsException(Resources.SAVED_FILM);
         }
 
@@ -99,16 +100,15 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public void removeFromSaved(Long filmId, SavedFilmStatus status, String userEmail) {
-        if (!userRepo.existsByEmail(userEmail)) {
-            throw new ResourceNotFoundException(Resources.USER, "email", userEmail);
+    public void removeFromSaved(String filmApiId, SavedFilmStatus status, String userEmail) {
+        User user = userRepo.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException(Resources.USER, "email", userEmail));
+
+        if (!filmRepo.existsByApiTitleId(filmApiId)) {
+            throw new ResourceNotFoundException(Resources.FILM, "filmApiId", String.valueOf(filmApiId));
         }
 
-        if (!filmRepo.existsById(filmId)) {
-            throw new ResourceNotFoundException(Resources.FILM, "id", String.valueOf(filmId));
-        }
-
-        SavedFilm savedFilm = savedFilmRepo.findByFilmIdAndStatus(filmId, status).orElseThrow(
+        SavedFilm savedFilm = savedFilmRepo.findByUserIdAndFilmApiTitleIdAndStatus(user.getId(), filmApiId, status).orElseThrow(
                 () -> new ResourceNotFoundException(Resources.SAVED_FILM));
 
         savedFilmRepo.delete(savedFilm);

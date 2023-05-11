@@ -99,10 +99,10 @@ public class FilmController {
     @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR', 'USER')")
-    @PostMapping("/{id}/add-to-saved")
-    ResponseEntity<HttpStatus> addToSaved(@PathVariable Long id, @RequestParam SavedFilmStatus status,
+    @PostMapping("/{filmApiId}/add-to-saved")
+    ResponseEntity<HttpStatus> addToSaved(@PathVariable String filmApiId, @RequestParam SavedFilmStatus status,
                                           Principal principal) {
-        filmService.addToSaved(id, status, principal.getName());
+        filmService.addToSaved(filmApiId, status, principal.getName());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -111,10 +111,10 @@ public class FilmController {
     @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR', 'USER')")
-    @DeleteMapping("/{id}/remove-from-saved")
-    ResponseEntity<HttpStatus> removeFromSaved(@PathVariable Long id, @RequestParam SavedFilmStatus status,
+    @DeleteMapping("/{filmApiId}/remove-from-saved")
+    ResponseEntity<HttpStatus> removeFromSaved(@PathVariable String filmApiId, @RequestParam SavedFilmStatus status,
                                                Principal principal) {
-        filmService.removeFromSaved(id, status, principal.getName());
+        filmService.removeFromSaved(filmApiId, status, principal.getName());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
