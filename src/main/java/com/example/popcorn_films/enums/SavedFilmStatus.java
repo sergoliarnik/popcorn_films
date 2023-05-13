@@ -4,6 +4,5 @@ public enum SavedFilmStatus {
     WATCH_LATER,
     WATCHED,
     FAVOURITE,
-
     DISLIKED
 }

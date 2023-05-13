@@ -7,7 +7,7 @@ import java.util.List;
 public interface FilmCommentService {
     List<CommentDto> findFilmCommentsByFilmId(Long filmId);
 
-    CommentDto saveFilmComment(CommentDto commentDto, String userEmail, Long filmId);
+    CommentDto saveFilmComment(CommentDto commentDto, String userEmail, String filmApiId);
 
     CommentDto updateFilmComment(CommentDto commentDto, String userEmail);
 

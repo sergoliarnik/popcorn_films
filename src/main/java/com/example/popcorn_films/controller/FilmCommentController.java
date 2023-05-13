@@ -49,9 +49,9 @@ public class FilmCommentController {
     @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR', 'USER')")
     @PostMapping
-    ResponseEntity<CommentDto> save(@RequestBody CommentDto commentDto, @RequestParam("film_id") Long filmId,
+    ResponseEntity<CommentDto> save(@RequestBody CommentDto commentDto, @RequestParam("film_id") String filmApiId,
                                     Principal principal) {
-        return new ResponseEntity<>(filmCommentService.saveFilmComment(commentDto, principal.getName(), filmId),
+        return new ResponseEntity<>(filmCommentService.saveFilmComment(commentDto, principal.getName(), filmApiId),
                 HttpStatus.CREATED);
     }
 

@@ -42,12 +42,12 @@ public class FilmCommentServiceImpl implements FilmCommentService {
     }
 
     @Override
-    public CommentDto saveFilmComment(CommentDto commentDto, String userEmail, Long filmId) {
+    public CommentDto saveFilmComment(CommentDto commentDto, String userEmail, String filmApiId) {
         User user = userRepo.findByEmail(userEmail).orElseThrow(
                 () -> new ResourceNotFoundException(Resources.USER, "email", userEmail));
 
-        Film film = filmRepo.findById(filmId).orElseThrow(
-                () -> new ResourceNotFoundException(Resources.FILM, "id", String.valueOf(filmId)));
+        Film film = filmRepo.findByApiTitleId(filmApiId).orElse(filmRepo.save(Film.builder().apiTitleId(filmApiId).build()));
+
 
         FilmComment filmComment = mapper.map(commentDto, FilmComment.class);
 
