@@ -2,6 +2,7 @@ package com.example.popcorn_films.controller;
 
 import com.example.popcorn_films.constants.HttpStatuses;
 import com.example.popcorn_films.dto.CommentDto;
+import com.example.popcorn_films.dto.CommentResponseDto;
 import com.example.popcorn_films.service.FilmCommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -38,7 +39,7 @@ public class FilmCommentController {
     @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
     @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     @GetMapping
-    ResponseEntity<List<CommentDto>> findAllByFilmId(@RequestParam("film_id") Long filmId) {
+    ResponseEntity<List<CommentResponseDto>> findAllByFilmId(@RequestParam("film_id") Long filmId) {
         return new ResponseEntity<>(filmCommentService.findFilmCommentsByFilmId(filmId), HttpStatus.OK);
     }
 
@@ -49,7 +50,7 @@ public class FilmCommentController {
     @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR', 'USER')")
     @PostMapping
-    ResponseEntity<CommentDto> save(@RequestBody CommentDto commentDto, @RequestParam("film_id") String filmApiId,
+    ResponseEntity<CommentResponseDto> save(@RequestBody CommentDto commentDto, @RequestParam("film_id") String filmApiId,
                                     Principal principal) {
         return new ResponseEntity<>(filmCommentService.saveFilmComment(commentDto, principal.getName(), filmApiId),
                 HttpStatus.CREATED);
@@ -62,7 +63,7 @@ public class FilmCommentController {
     @SecurityRequirement(name = "Bearer Authentication")
     @PreAuthorize("hasAnyRole('ADMIN', 'EDITOR', 'USER')")
     @PutMapping
-    ResponseEntity<CommentDto> update(@RequestBody CommentDto commentDto, Principal principal) {
+    ResponseEntity<CommentResponseDto> update(@RequestBody CommentDto commentDto, Principal principal) {
         return new ResponseEntity<>(filmCommentService.updateFilmComment(commentDto, principal.getName()),
                 HttpStatus.OK);
     }

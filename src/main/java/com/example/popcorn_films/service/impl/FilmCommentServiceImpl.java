@@ -3,6 +3,7 @@ package com.example.popcorn_films.service.impl;
 import com.example.popcorn_films.constants.ErrorMessages;
 import com.example.popcorn_films.constants.Resources;
 import com.example.popcorn_films.dto.CommentDto;
+import com.example.popcorn_films.dto.CommentResponseDto;
 import com.example.popcorn_films.entity.CommentLike;
 import com.example.popcorn_films.entity.Film;
 import com.example.popcorn_films.entity.FilmComment;
@@ -35,18 +36,19 @@ public class FilmCommentServiceImpl implements FilmCommentService {
     private final ModelMapper mapper;
 
     @Override
-    public List<CommentDto> findFilmCommentsByFilmId(Long filmId) {
+    public List<CommentResponseDto> findFilmCommentsByFilmId(Long filmId) {
         return filmCommentRepo.findAllByFilmId(filmId).stream()
-                .map(filmComment -> mapper.map(filmComment, CommentDto.class))
+                .map(filmComment -> mapper.map(filmComment, CommentResponseDto.class))
                 .toList();
     }
 
     @Override
-    public CommentDto saveFilmComment(CommentDto commentDto, String userEmail, String filmApiId) {
+    @Transactional
+    public CommentResponseDto saveFilmComment(CommentDto commentDto, String userEmail, String filmApiId) {
         User user = userRepo.findByEmail(userEmail).orElseThrow(
                 () -> new ResourceNotFoundException(Resources.USER, "email", userEmail));
 
-        Film film = filmRepo.findByApiTitleId(filmApiId).orElse(filmRepo.save(Film.builder().apiTitleId(filmApiId).build()));
+        Film film = filmRepo.findByApiTitleId(filmApiId).orElseGet(() -> filmRepo.save(Film.builder().apiTitleId(filmApiId).build()));
 
 
         FilmComment filmComment = mapper.map(commentDto, FilmComment.class);
@@ -54,12 +56,11 @@ public class FilmCommentServiceImpl implements FilmCommentService {
         filmComment.setFilm(film);
         filmComment.getComment().setUser(user);
 
-        return mapper.map(filmCommentRepo.save(filmComment), CommentDto.class);
+        return mapper.map(filmCommentRepo.save(filmComment), CommentResponseDto.class);
     }
 
     @Override
-    @Transactional
-    public CommentDto updateFilmComment(CommentDto commentDto, String userEmail) {
+    public CommentResponseDto updateFilmComment(CommentDto commentDto, String userEmail) {
         User user = userRepo.findByEmail(userEmail).orElseThrow(
                 () -> new ResourceNotFoundException(Resources.USER, "email", userEmail));
 
@@ -72,7 +73,7 @@ public class FilmCommentServiceImpl implements FilmCommentService {
 
         filmComment.getComment().setText(commentDto.getText());
 
-        return mapper.map(filmComment, CommentDto.class);
+        return mapper.map(filmComment, CommentResponseDto.class);
     }
 
     @Override

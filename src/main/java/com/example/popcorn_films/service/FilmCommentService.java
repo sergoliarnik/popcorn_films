@@ -1,15 +1,16 @@
 package com.example.popcorn_films.service;
 
 import com.example.popcorn_films.dto.CommentDto;
+import com.example.popcorn_films.dto.CommentResponseDto;
 
 import java.util.List;
 
 public interface FilmCommentService {
-    List<CommentDto> findFilmCommentsByFilmId(Long filmId);
+    List<CommentResponseDto> findFilmCommentsByFilmId(Long filmId);
 
-    CommentDto saveFilmComment(CommentDto commentDto, String userEmail, String filmApiId);
+    CommentResponseDto saveFilmComment(CommentDto commentDto, String userEmail, String filmApiId);
 
-    CommentDto updateFilmComment(CommentDto commentDto, String userEmail);
+    CommentResponseDto updateFilmComment(CommentDto commentDto, String userEmail);
 
     void deleteFilmCommentById(Long filmCommentId, String userEmail);
 
